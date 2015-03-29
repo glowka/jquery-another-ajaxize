@@ -46,7 +46,7 @@ v1.0.6
 
 tools:
 - animate function added, when using ajaxize_load or ajaxize_append automatically 'loading...' communicate appears
-- TODO:
+- T0 DO:
     -customizable communicate content
     -option of disabling animation (ajaxize_animate="false")
     -option of adding animation in case ajaxize_call is used (ajaxize_animate="<<selector>>")
@@ -96,7 +96,7 @@ core:
 - ajaxing jQuery extension accepts 'url' argument, if argument is given it updates object with it and re-ajaxizes it
 - possibility of making executing function right after making a request ( after ajaxize_prepare and before ajaxize_call)
   using parameter ajaxize_precall="<<function>>"
-TODO:
+TO DO:
   - in combination with ping function using ajaxize_precall can double the speed up making consequent request,
     so there is to do ping implementation and combining with ajaxize_precall
 
@@ -111,7 +111,7 @@ tools:
 - ping function added (unused so far)
 api:
 - ajaxize_animate=<<True|False>> added (takes effect only with load and append functions)
-TODO:
+T0 DO:
    - easy customizable content of ajaxize_animate
    - ajaxize_animate equivalent for ajaxie_call ('loading...' similar to gmail's one)
    - advanced option of checking textarea/input change caching the value
@@ -140,7 +140,7 @@ core & api & tools:
   Since now data-ajaxize-* attributes names are supported and will be shortly only valid option
 - bug of ajaxing namespace fixed - not only direct object of ajaxing namespace can be accessed but
   also indirect so e.g. ajaxize_call="names.function" is valid and ajaxing.names.function will be called
-TODO:
+T0 DO:
  - updating some core structures to ones that match better growing number of options
  - to gradually get prepared for bigger architecture changes
 -----
@@ -191,10 +191,13 @@ api
   
 v1.2.3
 bug
-- ajaxize_prepare when ajaxized used wothout url beahves exactly the same way as with it
+- ajaxize_prepare when ajaxized used without url behaves exactly the same way as with it
 core
 - on click, sumbit, hover, change preventDefault is called
 
 v1.2.4
 core
 - ajaxize_prepare is called right after catching the event not after awaiting the whole delay time
+
+v1.3.0
+- release after long time, with many bug fixes and extended functions
