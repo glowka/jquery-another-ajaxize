@@ -212,4 +212,12 @@ All new features to be described soon.
 *  ```ajaxize_prepare``` is called right after catching the event not after awaiting the whole delay time
 
 ##### 1.3.0
-*  release after long time, with many bug fixes and extended functions
+*release after long time, with many bug fixes and extended functions:*
+* ```ajaxize_method``` for making both post or get requests when needed
+* ```csrf``` global option for appending csrf var to request
+
+
+##### 1.3.1
+* ```ajaxize_propagation``` parameter to control ```event.stopPropagation()``` calling or not
+* ```ajaxize_events``` is now space separated list of events instead of space separated list of events, just like jQuery notation.s
+* ```sendAnalyticsEvent``` global option for automatic google analytics events logging
