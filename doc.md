@@ -2,7 +2,7 @@
 documentation for version **1.3.1**
 *by Tomasz Główka*
 
-### INTRODUCTION 
+### Introduction
 Main aims & functions of this tool:
  - help avoiding duplication of urls values in js code, so that it could remain in the single location - on server's
    script side
@@ -11,21 +11,22 @@ Main aims & functions of this tool:
  - eliminate constantly repeating and pretty obvious lines of code from HTTP request scheme
 
 Ajaxize processing scheme:
-1. [site loading] Finding all HTLM elements to be ajaxized ( looking for elements possessing attribute [ajaxize=do] )
+
+1. [site loading] Finding all HTLM elements to be ajaxized ( looking for elements possessing attribute ```ajaxize=do``` )
 2. [site loading] Validating all ajaxize attributes of elements (prefix 'ajaxize')
 3. [site loading] Basing on type of HTML element and ajaxize attributes for that element proper event hooks are used,
   like: click, submit, keydown etc.
 4. [user interaction] On event call, when hook is used HTTP request is completed with use of earlier validated ajaxize
   attributes.
 
-### CONF 
+### Options
 AJAXize global configuration fields list inside ajaxize namespace.
 
 * ```debugMode``` - full validation of ajaxized objects
 * ```cacheAjaxizedMode``` - making copy (shallow) of ajaxized object attrs if ```debugMode``` active
 * ```html5Mode``` - use data-ajaxize-* instead of ajaxize_* attributes
 * ```sendAnalyticsEvent``` -  automatic google analytics events logging
-* ```urlPrefix:string``` - sets prefix added to ajaxized urls
+* ```urlPrefix:string``` - sets prefix added to every url when making HTTP request
 * ```csrfVarName``` - name of csrf var sent with url
 * ```csrfGetter``` - path to global var with csrf value or function getting that value
 * ```customEvents:[string,..]``` - sets events that can be used inside ajaxize_events attribute (look at ATTRIBUTES)
@@ -33,17 +34,8 @@ AJAXize global configuration fields list inside ajaxize namespace.
 * ```customDelays:object {'event':value,... }``` - sets individual delay value for each event like ajaxize.delay does globally
 * ```timeout:integer``` - response timeout
 
-// key mode settings
 
-
-    sendAnalyticsEvent = true,  // try to send google analytics events on each ajaxing call
-
-    // prefix added to every url when making HTTP request
-    urlPrefix = '/ajax',
-    csrfVarName = 'csrfmiddlewaretoken',
-    csrfGetter = 'urls.csrfToken',
-
-### URLS 
+### Urls
 
 AJAXize automatically creates ajax urls by adding ajaxize.prefix prefix to original url of an element.
 Thanks to this solution, while making your HTML code you don't have to worry neither about manual creating ajax
@@ -54,7 +46,9 @@ Certain attributes are searched for as a source of request address:
 * href         in    ```<a>```
 * ajaxize_url  in    ```<other_tag>```  (more about attributes in next section)
 
-### ATTRIBUTES 
+```#``` url is treated as empty url
+
+### Attributes
 
 Set them in normal html way  ```<tag ajaxize_x="val_x" ajaxize_y="val_y></tag>.```
 
@@ -107,12 +101,12 @@ The other example, this time with passing the argument:
 <a class="ManyLoadHereElements"></a><a class="ManyLoadHereElements"></a>
 ```
 
-##### THIS
+##### This
 
 In all <<functions>> 'this' keyword points to the HTML element being subject of an action.
 
 
-### COMBINATIONS OF ATTRIBUTES 
+### Combinations of attributes
 
 Definition of element used with AJAXize:
 
@@ -152,22 +146,23 @@ Definition of element used with AJAXize:
 /tag>
 ```
 
+### Other features
 
-### EXPECTED TYPES OF SERVER RESPONSE 
+##### Expected types of server response
 
 
 * ```ajaxize_load``` | ```ajaxize_append``` - **HTML** - response loaded into or appended to HTML element
 * ```ajaxize_call``` - **JSON** - response passed as a function's argument
-*
+* ```ajaxize_call``` - **null** - if tag has no url attribute (view Urls section) or ```ajaxize_request``` is false, no http request is made and response is simply null
 
-### JQUERY EXTENSION 
+##### jQuery extension
 
 * ```jQuery(...).ajaxing()``` - make a single request with all selected by jQuery objects, objects does not have to have been ajaxized earlier
 * ```jQuery(...).ajaxize()``` - ajaxize all selected objects, they will behave like normal objects ajaxized using ```ajaxize="do"```
-* ```jQuery(...).deajaxize()``` - remove events binding that ocurred with previous ajaxize
-* ```jQuery(...).reajaxize([url])``` - remove events binding that ocurred with previous ajaxize, set new url (optionally) and ajaxize again
+* ```jQuery(...).deajaxize()``` - remove events binding that was created with previous ajaxize
+* ```jQuery(...).reajaxize([url])``` - remove events binding that was created with previous ajaxize, set new url (optionally) and ajaxize again
 
-### ONLOAD CUSTOM CODE EXECUTION 
+##### Custom code execution on each Ajax call
 To have certain script executed every time ajax request and response is given use ```ajaxize.register``` to add functions that will be executed after every request.
 
 Example:
@@ -176,7 +171,7 @@ var function_id = ajaxize.register(function(){}); // adding function(){} to onlo
 ajaxize.unregister(function_id); // removing function from onload execution
 ```
 
-### JSON EXTRA PARAMETERS 
+##### Json extra parameters
 When giving a response server can pass some parameters. They have to be included in ajaxize namespace.
 
 Here's the list of possible parameters:
@@ -190,7 +185,7 @@ Example of response with parameters (in javascript after JSON decoding):
 ```
 Above response will cause browser to load  page with '/' url.
 
-### ERRORS AND VALIDATION 
+##### Errors and validation
 For some typical errors proper console.error communicates will be thrown:
 
 ```
@@ -198,3 +193,41 @@ ajaxize_call="non_exisiting_function" - can't find function 'ajaxing.non_existin
 ajaxize_load=".NonExisitingClass" - no elements found for '.NonExisitngClass'
 ```
 Similarly, errors are thrown regarding to missing URL and any other important data.
+
+
+### AjaxWrap interface
+
+In fact, each time tag is ajaxized and when processing request, inner AjaxWrap interface is used.
+
+
+In most cases the above auto ajaxize interface should be used but in some cases advantage of direct use of AjaxWrap interface can be taken, so here it is.
+
+```AjaxWrap(object, [context])``` - initialize wrap on given object (tag or plain object), optional pass context arg if all ajaxing.* hooks should be called with this context instead of object
+* ```ajaxing()``` - trigger ajaxing action on given object/tag, the action will be processed according to its keys/attributes
+* ```ajaxize()``` - create ajaxize events listener on given object/tag, the action will be processed according to its keys/attributes, this will take the same effect as setting ```ajaxize="do"``` attribute
+* ```deajaxize()``` - remove events listeners that was created with earlier called ajaxize
+* ```reajaxize()``` - remove events binding that was created with previous ajaxize, set new url (optionally) and ajaxize again
+
+Examples of```AjaxWrap``` use:
+```
+
+# make request using plain object as argument with callback string reference
+AjaxWrap({ 'url': '/', 'call': 'generic.simpleAnswer'}).ajaxing();
+
+# make request using plain object as argument with callback direct reference
+AjaxWrap({ 'url': '/', 'call':  function() { /* empty call */}}).ajaxing();
+
+# make request using existing object
+var tag = jQuery('<a href='/' ajaxize_call="myCallback">Click here</a>).get(0)
+jQuery('body').append(tag)
+var tag = jQuery('<a href='/' ajaxize_call="myCallback">Click here</a>).get(0)
+AjaxWrap(tag).ajaxing()
+
+# ajaxize existing object
+var tag = jQuery('<a href='/' ajaxize_call="myCallback">Click here</a>).get(0)
+jQuery('body').append(tag)
+var tag = jQuery('<a href='/' ajaxize_call="myCallback">Click here</a>).get(0)
+AjaxWrap(tag).ajaxize()
+
+```
+
