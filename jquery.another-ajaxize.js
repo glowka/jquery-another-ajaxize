@@ -1,4 +1,4 @@
-//v1.2.5
+//v1.3.0
 //by Tomasz Główka
 
 (function (window) {
@@ -10,17 +10,19 @@ var // PUBLIC
     cacheAjaxizedMode = true,
     html5Mode = true,  // data-ajaxize mode instead of ajaxize mode
 
+    sendAnalyticsEvent = true,  // try to send google analytics events on each ajaxing call
+
     // prefix added to every url when making HTTP request
     urlPrefix = '/ajax',
     csrfVarName = 'csrfmiddlewaretoken',
-    csrfGetter = 'urls.csrf_token',
+    csrfGetter = 'urls.csrfToken',
 
     // possible events that can be specified using ajaxize_events
-    customEvents = ['keydown', 'keyup', 'change', 'submit', 'click', 'focus', 'blur', 'paste'],
+    customEvents = ['keydown', 'keyup', 'change', 'submit', 'click', 'focus', 'blur', 'paste', 'mouseover', 'mouseout'],
 
     // delay after which request is made, during delay no event can occur, unless, delay starts again,
     // delays dedicated for certain type of events are set in customDelays
-    defaultEventsDelay = 200, //300
+    defaultEventsDelay = 200,
     customEventsDelays = {
         keyup: 400,
         keydown: 400,
@@ -28,7 +30,9 @@ var // PUBLIC
         submit: 0,
         click: 0,
         paste: 0,
-        ajaxing: 0
+        ajaxing: 0,
+        mouseout: 0,
+        mouseover: 250
     },
     // HTTP response timeout
     timeout = 30000,
@@ -151,8 +155,7 @@ var AjaxWrap = function (objToWrap, context) {
 
 
 AjaxWrap.ajaxingReceive = function (event) {
-//    if(!event || event.target == this)
-        event.data.ajaxWrap.ajaxing(event);
+    event.data.ajaxWrap.ajaxing(event);
 };
 
 
@@ -200,8 +203,9 @@ AjaxWrap.prototype = {
         if (event) {
             if ((/(click|submit)/).test(event.type))
                 event.preventDefault();
-            if ((/(ajaxing)/).test(event.type) || !this.propagation(true /* transformed */))
+            if ((/(ajaxing)/).test(event.type) || !this.propagation(true /* transformed */)) {
                 event.stopPropagation();
+            }
             // space for to-be-called ajaxing function to pass any parameters using event
             event.data.ajaxing = {};
         }
@@ -255,6 +259,7 @@ AjaxWrap.prototype = {
             //call without HTTP request
             this.call(true /*transformed*/ ).apply(this.context, [null, null, event, pipeData]);
             tools.registerExec(this, event);
+            tools.sendAnalyticsEvent(this, event);
         } else { //make HTTP request before calling
             var url = ajaxTemplate.url(this);
             var settings = {};
@@ -300,7 +305,7 @@ AjaxWrap.prototype = {
             // cache ajaxized mode and this valid -> cache
             this.cacheOrigin();
 
-        var declaredEvents = this.events();
+        var declaredEvents = this.events(true /*transformed*/);
         var tagDefaultEvents = 'ajaxing' + ' ';
         if(util.isNode(this.origin)) {
             var tag = this.tagName().toLowerCase();
@@ -313,7 +318,8 @@ AjaxWrap.prototype = {
         }
 
         // HERE IS event handles setting
-        var allEvents = tagDefaultEvents + ' ' + declaredEvents;
+        // add default events and declared ones and make sure they don't repeat == are unique
+        var allEvents = jQuery.unique((tagDefaultEvents + ' ' + declaredEvents).split(' ')).join(' ');
         jQuery(this.origin).on(allEvents, null, {'ajaxWrap': this}, AjaxWrap.ajaxingReceive);
 
         // tie created wrap with ajaxized object
@@ -372,7 +378,7 @@ AjaxWrap.prototype = {
 
     cacheOrigin: function() {
         var fields = ['url', 'call', 'precall', 'load', 'append', 'closest',
-                      'events', 'animate', 'history', 'request',  'prepare',
+                      'events', 'animate', 'history', 'request',  'prepare', 'propagation',
                       'tagName', 'method'];
         this.originCache = {};
         for(var i = 0; i < fields.length; i++)
@@ -438,7 +444,7 @@ AjaxWrap.prototype = {
         var i;
         // event parameters
         if (this.events()) {
-            var events = this.events().split(' ');
+            var events = this.events(true /*transformed*/).split(' ');
             for (i = 0; i < events.length; i++)
                 if (!eventRegex.test(events[i]))
                     throw new ajaxizeError(util.str(errors.badEvents, events[i]), this);
@@ -523,7 +529,7 @@ AjaxWrap.prototype = {
     },
 
     'events': function (transformed, original) {
-        return this.dispatchAjaxizeAttr('events', transformed, original);
+        return this.ajaxizeStrAttr('events', transformed, original);
     },
     'propagation': function(transformed, original) {
         return this.ajaxizeBoolAttr('propagation', transformed, original, true);  // default value is true
@@ -612,6 +618,14 @@ AjaxWrap.prototype = {
         return typeof val !== 'undefined' ? val : null
     },
 
+    ajaxizeStrAttr: function (attrName, transformed, original) {
+        var val = this.dispatchAjaxizeAttr(attrName, transformed, original);
+        if (!transformed)
+            return val;
+
+        return val || '';
+    },
+
     ajaxizeBoolAttr: function (attrName, transformed, original, defaultValue) {
         var val = this.dispatchAjaxizeAttr(attrName, transformed, original);
         if (!transformed)
@@ -621,7 +635,7 @@ AjaxWrap.prototype = {
             return val.toLowerCase() == 'true';
         if (typeof val === "boolean")
             return val;
-        return defaultValue || false;  //if defaultValue is undefined return false, if false, return false
+        return (typeof defaultValue === 'undefined' ? false : defaultValue) || false;  //if defaultValue is undefined return false, if false, return false
     },
 
     dispatchAttr: function(attrName, transformed, original) {
@@ -726,7 +740,7 @@ var ajaxTemplate = {
                 if(val) {
                     val = [csrfVarName, '=', val].join('');
                 }
-                return val && data ? [data, '&', val].join('') : data || val;
+                return (val && data) ? [data, '&', val].join('') : (data || val);
             },
 
             'context': function (ajaxWrap, event, pipeData) {
@@ -795,6 +809,7 @@ var ajaxTemplate = {
                     ajaxize.autoAjaxize();
                     //let's call all functions registered for calling after ajaxing anything
                     tools.registerExec(ajaxWrap, event);
+                    tools.sendAnalyticsEvent(ajaxWrap, event);
                 };
             },
 
@@ -879,6 +894,20 @@ var tools = {
                     if (registered.hasOwnProperty(func) &&
                             typeof registered[func] == 'function')
                         registered[func].apply(ajaxWrap.context, [event]);
+        },
+        'sendAnalyticsEvent': function(ajaxWrap, event) {
+            if(!sendAnalyticsEvent)
+                return;
+            if(typeof ga === 'undefined')
+                return;
+            if(!event || jQuery.inArray(event.type, ['click', 'submit', 'change', 'keyup']) == -1)
+                return;
+            var $origin = jQuery(ajaxWrap.origin),
+                calledFunc = (ajaxWrap.call() || (ajaxWrap.load() ? 'load' : '') || 'no func:') + ': ',
+                contentLabel = $origin.text().trim().substring(0, 100),
+                targetLabel = $origin.attr('class'),
+                label = contentLabel || targetLabel || 'no label';
+            ga('send', 'event', 'AJAX', event.type, calledFunc + label);
         }
     }, //tools
 
@@ -929,7 +958,7 @@ var tools = {
         badFunction: "can't find function 'ajaxing.%s'",
         badSelector: "no objects found for '%s' selector",
         badClosestSelector: "no objects found for '%s' closest selector",
-        badEvents: "invalid ajaxize_events value, it must be a comma separated list " +
+        badEvents: "invalid ajaxize_events value, it must be a space separated list " +
                          "of events set in customEvents setting, stopped at '%s'",
         badMethod: "invalid form method, possible values are GET and POST",
         badParams: "incorrect '%s' parameter",
