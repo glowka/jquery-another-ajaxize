@@ -603,8 +603,8 @@ AjaxWrap.prototype = {
         if(attrName == 'closest')
             val = jQuery(this.context).closest(val).get(0);
         else
-            // We assume this.closest() is valid (the closest element can be found)
-            // so CLOSEST has to be VALIDATED during validation AS FIRST SELECTOR
+            // We assume this.closest() is valid (the closest element can be found),
+            // this assumption means closest HAS TO BE VALIDATED during validation AS FIRST SELECTOR
             if(val == 'closest' || val == 'this')
                 if(this.closest())
                     val = this.closest(true /* transformed */ );

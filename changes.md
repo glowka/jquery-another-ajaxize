@@ -218,6 +218,6 @@ All new features to be described soon.
 
 
 ##### 1.3.1
-* ```ajaxize_propagation``` parameter to control ```event.stopPropagation()``` calling or not
+* ```ajaxize_propagation``` parameter to control ```event.stopPropagation()``` calling or not, by default true
 * ```ajaxize_events``` is now space separated list of events instead of space separated list of events, just like jQuery notation.s
 * ```sendAnalyticsEvent``` global option for automatic google analytics events logging
