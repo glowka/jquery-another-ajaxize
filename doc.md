@@ -67,26 +67,48 @@ List of all possible attributes:
 * ```ajaxize_history="<<True|False>>"```    - if checked ajaxize catches history and pushes history state, so 'back' button can be used; 
 * ```ajaxize_animate="<<True|False>>"```    - if checked ajaxize adds 'loading...' information while waiting for server response, takes effect only if ```ajaxize_load``` or ```ajaxzie_append``` is specified
 
+##### Expected types of server response
+
+* ```ajaxize_load``` | ```ajaxize_append``` - **HTML** - response loaded into or appended to HTML element
+* ```ajaxize_call``` - **JSON** - response passed as a function's argument
+* ```ajaxize_call``` - **null** - if tag has no url attribute (view Urls section) or ```ajaxize_request``` is false, no http request is made and response is simply null
+
 ##### All ```<<functions>>``` have to be located in 'ajaxing' namespace.
 
 It means that you should define your function as follows:
 ```
 # in html
-< ajaxize_prepare="my_function">
+< ajaxize_call="my_function" />
+
 ...
-# in js
-ajaxing.my_function = function(){};
+
+# somewhere else/later in js
+ajaxing.my_function = function(target, data, event, pipeData){};
 ```
 Such definition can be placed in any javascript file which inclusion succeeds ajaxize.js
 
-The other example, this time with passing the argument:
-```
-    # in html
-    < ajaxize_call="my_function" />
-    ...
-    # in js
-    ajaxing.my_function = function(target, data, event, pipeData){};
-```
+##### ```<<functions>>``` API
+
+```ajaxize_prepare``` :
+* ```event``` - event that trigger this ajaxing action, if triggered manually ```null```
+* ```pipeData``` - object passed to functions in pipeline - through ```ajaxize_prepare```, ```ajaxize_precall``` and ```ajaxize_call```
+* return value evealuating to ```true``` to allow continuing ajaxing proccess and value evaluating to ```false``` to stop it, if ```false``` returned in any case not HTTP request is made 
+
+```ajaxize_precall``` : 
+* ```event``` - event that trigger this ajaxing action, if triggered manually ```null```
+* ```pipeData``` - object passed to functions in pipeline - through ```ajaxize_prepare```, ```ajaxize_precall``` and ```ajaxize_call```
+
+```ajaxize_call``` :
+* ```target``` - if ```ajaxize_load``` or ```ajaxize_append``` is defined (so serverer response is HTML) refers to DOM element server response will be loaded or appended to, otherwise ```null```
+* ```data``` - if ```ajaxize_load``` or ```ajaxize_append``` is *not* defined (so server response is JSON) contanis deserialized data from response, otherwise ```null```
+* ```event``` - event that trigger this ajaxing action, if triggered manually ```null```
+* ```pipeData``` - object passed to functions in pipeline - through ```ajaxize_prepare```, ```ajaxize_precall``` and ```ajaxize_call```
+
+
+##### This
+
+In all <<functions>> 'this' keyword points to the HTML element being subject of an action.
+
 
 ##### The ```<<selectors>>``` may look like these:
 ```
@@ -100,11 +122,6 @@ The other example, this time with passing the argument:
 # assuming there are such elements with corresponding id/class/other attribute:
 <a class="ManyLoadHereElements"></a><a class="ManyLoadHereElements"></a>
 ```
-
-##### This
-
-In all <<functions>> 'this' keyword points to the HTML element being subject of an action.
-
 
 ### Combinations of attributes
 
@@ -148,12 +165,6 @@ Definition of element used with AJAXize:
 
 ### Other features
 
-##### Expected types of server response
-
-
-* ```ajaxize_load``` | ```ajaxize_append``` - **HTML** - response loaded into or appended to HTML element
-* ```ajaxize_call``` - **JSON** - response passed as a function's argument
-* ```ajaxize_call``` - **null** - if tag has no url attribute (view Urls section) or ```ajaxize_request``` is false, no http request is made and response is simply null
 
 ##### jQuery extension
 
