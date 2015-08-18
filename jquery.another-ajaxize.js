@@ -210,8 +210,8 @@ AjaxWrap.prototype = {
             event.data.ajaxing = {};
         }
 
-        // if prepare is specified it must return true, otherwise it's time to leave
-        if (this.prepare() && !this.prepare(true /*transformed*/ ).apply(this.context, [event, pipeData]))
+        // if prepare is specified it must not return false (value and type match), otherwise it's time to leave
+        if (this.prepare() && this.prepare(true /*transformed*/ ).apply(this.context, [event, pipeData]) === false)
             return this;
 
         // If this object is not already making another query right now.
