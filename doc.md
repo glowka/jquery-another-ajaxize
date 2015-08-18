@@ -55,7 +55,7 @@ Set them in normal html way  ```<tag ajaxize_x="val_x" ajaxize_y="val_y></tag>.`
 List of all possible attributes:
 * ```ajaxize="do"``` - submits element to AJAXize processing;
 * ```ajaxize_url="<<url>>"``` - when regarding to HTML specification object can't posses action or href attribute, ajaxize_url with valid url must be specified instead (without ajax prefix);
-* ```ajaxize_prepare="<<function>>"``` - function called before making HTTP request, event object is passed as an argument, in case of returning false the request will be canceled; <<function>> has to be located in 'ajaxing' namespace;
+* ```ajaxize_prepare="<<function>>"``` - function called before making HTTP request, event object is passed as an argument, in case of returning `false` (matching by value and type) the request will be canceled; <<function>> has to be located in 'ajaxing' namespace;
 * ```ajaxize_precall="<<function>>"```          - function called after HTTP request is made, but before response is given, in fact function called right after HTTP request
 * ```ajaxize_call="<<function>>"``` - after HTTP request, content of response is passed as an argument; <<function>> has to be located in ```ajaxing``` namespace; if no url is defined and ajaxize_call is given, it will be executed without making a request, as a simple handler
 * ```ajaxize_load="<<selector>>"``` - after HTTP request, content of response is loaded into elements selected by this selector, selector 'this' can be used to refer to element that is AJAXized, selector 'closest' can be used to refer to ajaxize_closest value ;
@@ -92,7 +92,7 @@ Such definition can be placed in any javascript file which inclusion succeeds aj
 ```ajaxize_prepare``` :
 * ```event``` - event that trigger this ajaxing action, if triggered manually ```null```
 * ```pipeData``` - object passed to functions in pipeline - through ```ajaxize_prepare```, ```ajaxize_precall``` and ```ajaxize_call```
-* return value evealuating to ```true``` to allow continuing ajaxing proccess and value evaluating to ```false``` to stop it, if ```false``` returned in any case not HTTP request is made 
+* return ```false``` to prevent continuing ajaxing proccess and any other value to let it continue, if ```false``` returned, no HTTP request is made in any case
 
 ```ajaxize_precall``` : 
 * ```event``` - event that trigger this ajaxing action, if triggered manually ```null```
