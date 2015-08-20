@@ -1,4 +1,4 @@
-//v1.3.1
+//v1.3.2
 //by Tomasz Główka
 
 (function (window) {
@@ -201,7 +201,11 @@ AjaxWrap.prototype = {
             return this;
 
         if (event) {
-            if ((/(click|submit)/).test(event.type))
+            if (
+                (this.prevent() && this.prevent(true /* transformed */))
+                ||
+                (!this.prevent() && (/(click|submit)/).test(event.type))
+            )
                 event.preventDefault();
             if ((/(ajaxing)/).test(event.type) || !this.propagation(true /* transformed */)) {
                 event.stopPropagation();
@@ -378,7 +382,7 @@ AjaxWrap.prototype = {
 
     cacheOrigin: function() {
         var fields = ['url', 'call', 'precall', 'load', 'append', 'closest',
-                      'events', 'animate', 'history', 'request',  'prepare', 'propagation',
+                      'events', 'animate', 'history', 'request',  'prepare', 'propagation', 'prevent',
                       'tagName', 'method'];
         this.originCache = {};
         for(var i = 0; i < fields.length; i++)
@@ -452,6 +456,10 @@ AjaxWrap.prototype = {
         // all other parameters
         var paramStrings = [{
             value: this.history(false, true) /* not transformed and original */ , params: ['true', 'false']
+        }, {
+            value: this.propagation(false, true) /* not transformed and original  */, params: ['true', 'false']
+        }, {
+            value: this.prevent(false, true) /* not transformed and original  */, params: ['true', 'false']
         }, {
             value: this.animate(false, true) /* not transformed and original  */, params: ['true', 'false']
         }, {
@@ -533,6 +541,9 @@ AjaxWrap.prototype = {
     },
     'propagation': function(transformed, original) {
         return this.ajaxizeBoolAttr('propagation', transformed, original, true);  // default value is true
+    },
+    'prevent': function(transformed, original) {
+        return this.ajaxizeBoolAttr('prevent', transformed, original, false);  // default value is false
     },
     'history': function (transformed, original) {
         return this.ajaxizeBoolAttr('history', transformed, original);

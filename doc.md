@@ -1,5 +1,5 @@
 # another-ajaxize 
-documentation for version **1.3.1**
+documentation for version **1.3.2**
 *by Tomasz Główka*
 
 ### Introduction
@@ -62,7 +62,8 @@ List of all possible attributes:
 * ```ajaxize_append="<<selector>>"``` - after HTTP request, content of response is appended to elements selected by this selector, selector 'this' can be used to refer to element that is AJAXized, selector 'closest' can be used to refer to ajaxize_closest value;
 * ```ajaxize_closest="<<selector>>"``` - with this option ajaxize_load and ajaxize_append range of action is limited to objects being inside selector 'closest' matching object
 * ```ajaxize_events="<<events list>>"```        - comma separated list of events that will be additionally caught, events have to be added to ```ajaxize.customEvents``` conf first to set themas valid events
-* ```ajaxize_propagation="<<events list>>"```        - by default set to true, if true event propagation takes place, otherwise ```event.stopPropagation()``` is called
+* ```ajaxize_propagation="<<True|False>>"```        - by default set to true, if true event propagation takes place, otherwise ```event.stopPropagation()``` is called
+* ```ajaxize_prevent="<<True|False>>"```        - by default set to true for click and submit events and false for all other events, if true ```event.preventDefault()``` is called
 * ```ajaxize_request="<<True|False>>"```        - by default set to true, if otherwise, even in case url is defined, an HTTP request won't be made and ajaxize_call we'll be called
 * ```ajaxize_history="<<True|False>>"```    - if checked ajaxize catches history and pushes history state, so 'back' button can be used; 
 * ```ajaxize_animate="<<True|False>>"```    - if checked ajaxize adds 'loading...' information while waiting for server response, takes effect only if ```ajaxize_load``` or ```ajaxzie_append``` is specified
