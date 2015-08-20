@@ -29,9 +29,8 @@ AJAXize global configuration fields list inside ajaxize namespace.
 * ```urlPrefix:string``` - sets prefix added to every url when making HTTP request
 * ```csrfVarName``` - name of csrf var sent with url
 * ```csrfGetter``` - path to global var with csrf value or function getting that value
-* ```customEvents:[string,..]``` - sets events that can be used inside ajaxize_events attribute (look at ATTRIBUTES)
-* ```defaultEventsDelay:integer``` - sets global value of period (in ms) that must occur after triggering AJAXize hooks before request is actually made, when time is not up and new hook is triggered again, another period of time must occur
-* ```customDelays:object {'event':value,... }``` - sets individual delay value for each event like ajaxize.delay does globally
+* ```defaultDelay:integer``` - sets global value of period (in ms) that must occur after triggering AJAXize hooks before request is actually made, when time is not up and new hook is triggered again, another period of time must occur
+* ```defaultEventsDelays:object {'event':value,... }``` - sets individual delay value for each event like ajaxize.delay does globally
 * ```timeout:integer``` - response timeout
 
 

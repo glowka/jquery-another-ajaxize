@@ -17,13 +17,10 @@ var // PUBLIC
     csrfVarName = 'csrfmiddlewaretoken',
     csrfGetter = 'urls.csrfToken',
 
-    // possible events that can be specified using ajaxize_events
-    customEvents = ['keydown', 'keyup', 'change', 'submit', 'click', 'focus', 'blur', 'paste', 'mouseover', 'mouseout'],
-
     // delay after which request is made, during delay no event can occur, unless, delay starts again,
     // delays dedicated for certain type of events are set in customDelays
-    defaultEventsDelay = 200,
-    customEventsDelays = {
+    defaultDelay = 0,
+    defaultEventsDelay = {
         keyup: 400,
         keydown: 400,
         change: 10,
@@ -44,8 +41,8 @@ var // PUBLIC
 
     // CORE
 
-    // eventRegex -> used for ajaxize_event validation
-    eventRegex = new RegExp('^\\s*(?:' + customEvents.join('|') + ')\\s*$', 'i'),
+    // eventRegex -> used for ajaxize_event validation, single event regex
+    eventRegex = new RegExp('^([^.]*)(?:\.(.+)|)$', 'i'),
 
     // ajaxize counter for generating ids
     ajaxizedIdField = 'ajaxWrap',
@@ -214,19 +211,18 @@ AjaxWrap.prototype = {
             event.data.ajaxing = {};
         }
 
-        // if prepare is specified it must not return false (value and type match), otherwise it's time to leave
+        // If `prepare` is specified it must not return false (value and type match), otherwise it's time to leave
         if (this.prepare() && this.prepare(true /*transformed*/ ).apply(this.context, [event, pipeData]) === false)
             return this;
 
-        // If this object is not already making another query right now.
+        // Check if this object is not already making another query right now.
         if (!this.state.isRunning) {
             // By very default there is no delay
             var delay = 0;
             if(event)
                 // If event is given, first, delay is obtained from custom delays conf,
                 // if there is no definition for current event, default event delay is taken.
-                delay = event.type in customEventsDelays ?
-                    customEventsDelays[event.type] : defaultEventsDelay;
+                delay = event.type in defaultEventsDelay ? defaultEventsDelay[event.type] : defaultDelay;
 
             if (delay > 0) // delay >0 , so use delay mechanism
                 this.ajaxingDelay(event, pipeData, delay);
@@ -448,7 +444,7 @@ AjaxWrap.prototype = {
         var i;
         // event parameters
         if (this.events()) {
-            var events = this.events(true /*transformed*/).split(' ');
+            var events = this.events(true /*transformed*/).replace(/\s+/, ' ').trim().split(' ');
             for (i = 0; i < events.length; i++)
                 if (!eventRegex.test(events[i]))
                     throw new ajaxizeError(util.str(errors.badEvents, events[i]), this);
@@ -970,7 +966,7 @@ var tools = {
         badSelector: "no objects found for '%s' selector",
         badClosestSelector: "no objects found for '%s' closest selector",
         badEvents: "invalid ajaxize_events value, it must be a space separated list " +
-                         "of events set in customEvents setting, stopped at '%s'",
+                         "of valid js events (with optional namespaces), stopped at '%s'",
         badMethod: "invalid form method, possible values are GET and POST",
         badParams: "incorrect '%s' parameter",
         noOptionSet: "either ajaxize call, load or append has to be specified",
