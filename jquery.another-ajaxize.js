@@ -1,4 +1,4 @@
-//v1.3.2
+//v1.3.3
 //by Tomasz Główka
 
 (function (window) {
@@ -28,8 +28,8 @@ var // PUBLIC
         click: 0,
         paste: 0,
         ajaxing: 0,
-        mouseout: 0,
-        mouseover: 250
+        mouseout: 10,
+        mouseover: 100
     },
     // HTTP response timeout
     timeout = 30000,
@@ -217,12 +217,12 @@ AjaxWrap.prototype = {
 
         // Check if this object is not already making another query right now.
         if (!this.state.isRunning) {
-            // By very default there is no delay
-            var delay = 0;
-            if(event)
-                // If event is given, first, delay is obtained from custom delays conf,
-                // if there is no definition for current event, default event delay is taken.
-                delay = event.type in defaultEventsDelay ? defaultEventsDelay[event.type] : defaultDelay;
+            // By very default there is no delay (defaultDelay).
+            // If event is given, first, delay is obtained from attr, then from custom delays conf,
+            // if there is no definition for current event, default event delay is taken.
+            var delay = this.delay() ? this.delay(true /*transformed*/ ) :
+                (event && (event.type in defaultEventsDelay) ? defaultEventsDelay[event.type] : defaultDelay);
+
 
             if (delay > 0) // delay >0 , so use delay mechanism
                 this.ajaxingDelay(event, pipeData, delay);
@@ -378,7 +378,7 @@ AjaxWrap.prototype = {
 
     cacheOrigin: function() {
         var fields = ['url', 'call', 'precall', 'load', 'append', 'closest',
-                      'events', 'animate', 'history', 'request',  'prepare', 'propagation', 'prevent',
+                      'events', 'animate', 'history', 'request',  'prepare', 'propagation', 'prevent', 'delay',
                       'tagName', 'method'];
         this.originCache = {};
         for(var i = 0; i < fields.length; i++)
@@ -541,6 +541,9 @@ AjaxWrap.prototype = {
     'prevent': function(transformed, original) {
         return this.ajaxizeBoolAttr('prevent', transformed, original, false);  // default value is false
     },
+    'delay': function(transformed, original) {
+        return this.ajaxizeIntAttr('delay', transformed, original);
+    },
     'history': function (transformed, original) {
         return this.ajaxizeBoolAttr('history', transformed, original);
     },
@@ -631,6 +634,14 @@ AjaxWrap.prototype = {
             return val;
 
         return val || '';
+    },
+
+    ajaxizeIntAttr: function (attrName, transformed, original) {
+        var val = this.dispatchAjaxizeAttr(attrName, transformed, original);
+        if (!transformed)
+            return val;
+
+        return parseInt(val) || 0;
     },
 
     ajaxizeBoolAttr: function (attrName, transformed, original, defaultValue) {

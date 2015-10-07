@@ -1,5 +1,5 @@
 # another-ajaxize 
-documentation for version **1.3.2**
+documentation for version **1.3.3**
 *by Tomasz Główka*
 
 ### Introduction
@@ -63,6 +63,7 @@ List of all possible attributes:
 * ```ajaxize_events="<<events list>>"```        - comma separated list of events that will be additionally caught, events have to be added to ```ajaxize.customEvents``` conf first to set themas valid events
 * ```ajaxize_propagation="<<True|False>>"```        - by default set to true, if true event propagation takes place, otherwise ```event.stopPropagation()``` is called
 * ```ajaxize_prevent="<<True|False>>"```        - by default set to true for click and submit events and false for all other events, if true ```event.preventDefault()``` is called
+* ```ajaxize_delay="<<int>>"```        - sets time that has to be elapsed to proceed ajaxing after event took place, this overrides default value from ```defaultEventsDelays``` setting
 * ```ajaxize_request="<<True|False>>"```        - by default set to true, if otherwise, even in case url is defined, an HTTP request won't be made and ajaxize_call we'll be called
 * ```ajaxize_history="<<True|False>>"```    - if checked ajaxize catches history and pushes history state, so 'back' button can be used; 
 * ```ajaxize_animate="<<True|False>>"```    - if checked ajaxize adds 'loading...' information while waiting for server response, takes effect only if ```ajaxize_load``` or ```ajaxzie_append``` is specified

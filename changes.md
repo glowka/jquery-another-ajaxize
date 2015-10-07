@@ -226,5 +226,6 @@ All new features to be described soon.
 * ```ajaxize_prevent``` parameter to control ```event.preventDefualt()``` calling or not, by default true for click and submit events and false for all others
 * ```ajaxize_prepare``` must return exactly ```false``` matched by value and type to stop ajaxing process, previously it was any value evaluating to ```false```
  
-##### unrelased
+##### 1.3.3
 * ```ajaxize_events``` more liberal validation
+* ```ajaxize_delay``` parameter to control time elapsed after event for each ajaxize instance eventually
