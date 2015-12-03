@@ -229,3 +229,6 @@ All new features to be described soon.
 ##### 1.3.3
 * ```ajaxize_events``` more liberal validation
 * ```ajaxize_delay``` parameter to control time elapsed after event for each ajaxize instance eventually
+
+##### 1.3.4
+* ```area``` tag tread as ```a``` when ajaxizing (same default events etc)

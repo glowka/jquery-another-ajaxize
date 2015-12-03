@@ -42,7 +42,7 @@ addresses, nor about the way to dynamically pass them to your javascript code.
 
 Certain attributes are searched for as a source of request address:
 * action       in    ```<form>```
-* href         in    ```<a>```
+* href         in    ```<a>``` and ```<area>```
 * ajaxize_url  in    ```<other_tag>```  (more about attributes in next section)
 
 ```#``` url is treated as empty url

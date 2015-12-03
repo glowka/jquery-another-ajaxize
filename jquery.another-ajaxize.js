@@ -1,4 +1,4 @@
-//v1.3.3
+//v1.3.4
 //by Tomasz Główka
 
 (function (window) {
@@ -309,7 +309,7 @@ AjaxWrap.prototype = {
         var tagDefaultEvents = 'ajaxing' + ' ';
         if(util.isNode(this.origin)) {
             var tag = this.tagName().toLowerCase();
-            if( jQuery.inArray(tag, ['a', 'button']) != -1 ) // inArray == indexOf for ie
+            if( jQuery.inArray(tag, ['a', 'area', 'button']) != -1 ) // inArray == indexOf for ie
                 tagDefaultEvents += 'click';
             else if(jQuery.inArray(tag, ['form']) != -1) // inArray == indexOf for ie
                 tagDefaultEvents += 'submit';
@@ -691,6 +691,7 @@ AjaxWrap.prototype = {
             case 'form':
                 this.setAttr('action', value); break;
             case 'a':
+            case 'area':
                 this.setAttr('href', value); break;
             default:
                 this.setAjaxizeAttr('url', value); break;
